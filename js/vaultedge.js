@@ -1,4 +1,4 @@
-// VaultEdge Custom JS
+// Amex Innovations Custom JS
 
 // Sticky navbar on scroll
 window.addEventListener('scroll', function() {
