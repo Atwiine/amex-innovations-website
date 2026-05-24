@@ -15,3 +15,9 @@ desktop.ini
 # Local environment / server config
 .env
 .env.local
+
+# Legacy site — not part of the live build
+amex-old/
+
+# Claude Code memory
+.claude/
