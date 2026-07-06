@@ -15,6 +15,14 @@ desktop.ini
 # Local environment / server config
 .env
 .env.local
+config.php
+
+# User-uploaded content
+img/uploads/*
+!img/uploads/.htaccess
+!img/uploads/team/
+!img/uploads/projects/
+!img/uploads/site/
 
 # Legacy site — not part of the live build
 amex-old/

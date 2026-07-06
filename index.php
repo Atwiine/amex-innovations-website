@@ -1,73 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
+require_once __DIR__ . '/includes/functions.php';
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="description" content="Amex Innovations Ltd builds practical software, management systems, SaaS platforms, IoT tools, and digital solutions for businesses and organizations across Uganda.">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <title>Amex Innovations Ltd - Practical Software for Growing Organizations</title>
-
-    <link rel="icon" type="image/png" href="img/core-img/logo.png">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/custom-override.css">
-</head>
-
-<body>
-    <!-- Preloader -->
-    <div class="preloader d-flex align-items-center justify-content-center">
-        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-    </div>
-
-    <!-- ===== NAVBAR ===== -->
-    <header class="ve-header" id="ve-sticky">
-        <div class="container-fluid ve-nav-wrap">
-            <div class="ve-logo">
-                <a href="index.html">
-                    <span class="ve-logo-icon">
-                        <img src="img/core-img/logo.png" alt="Amex Innovations">
-                    </span>
-                    <span class="ve-logo-text">Amex <strong>Innovations</strong></span>
-                </a>
-            </div>
-
-            <nav class="ve-nav">
-                <ul>
-                    <li><a href="index.html" class="active">Home</a></li>
-                    <li class="has-drop">
-                        <a href="about.html">About <i class="fa fa-angle-down"></i></a>
-                        <ul class="ve-dropdown">
-                            <li><a href="about.html">Who We Are</a></li>
-                            <li><a href="about.html#mission">Our Mission</a></li>
-                            <li><a href="about.html#team">The Team</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="services.html">Services</a></li>
-                    <li><a href="projects.html">Projects</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-
-            <div class="ve-nav-cta">
-                <a href="contact.html" class="ve-cta-btn">Let's Talk <i class="fa fa-arrow-right"></i></a>
-            </div>
-
-            <button class="ve-toggler" id="ve-toggle">
-                <span></span><span></span><span></span>
-            </button>
-        </div>
-
-        <div class="ve-mobile-menu" id="ve-mobile-menu">
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="projects.html">Projects</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </div>
-    </header>
+$active = 'home';
+$page_title = 'Amex Innovations Ltd - Practical Software for Growing Organizations';
+$page_description = 'Amex Innovations Ltd builds practical software, management systems, SaaS platforms, IoT tools, and digital solutions for businesses and organizations across Uganda.';
+require __DIR__ . '/includes/header.php';
+?>
 
     <!-- ===== HERO ===== -->
     <section class="ve-hero">
@@ -76,8 +14,8 @@
             <h1>Software That Helps Your Organization <span class="ve-highlight">Work Better.</span></h1>
             <p>We build custom systems, SaaS platforms, websites, IoT tools, and digital workflows that make daily operations easier to manage. If your team is losing time to paper records, scattered spreadsheets, manual reports, or disconnected tools, we turn that work into a clear system your people can actually use.</p>
             <div class="ve-hero-btns">
-                <a href="services.html" class="ve-btn-primary">See What We Build</a>
-                <a href="contact.html" class="ve-btn-ghost">Tell Us Your Challenge</a>
+                <a href="services.php" class="ve-btn-primary">See What We Build</a>
+                <a href="contact.php" class="ve-btn-ghost">Tell Us Your Challenge</a>
             </div>
             <div class="ve-hero-stats">
                 <div class="ve-stat">
@@ -97,8 +35,8 @@
             </div>
         </div>
         <div class="ve-hero-right">
-            <div class="ve-hero-img-main bg-img" style="background-image:url(img/bg-img/1.jpg);"></div>
-            <div class="ve-hero-img-accent bg-img" style="background-image:url(img/bg-img/3.jpg);"></div>
+            <div class="ve-hero-img-main bg-img" style="background-image:url(<?= e(site_image('home_hero_main', 'img/bg-img/1.jpg')) ?>);"></div>
+            <div class="ve-hero-img-accent bg-img" style="background-image:url(<?= e(site_image('home_hero_accent', 'img/bg-img/3.jpg')) ?>);"></div>
             <div class="ve-float-card">
                 <i class="fa fa-check-circle" style="color:#E64A19;"></i>
                 <div>
@@ -169,7 +107,7 @@
                     <div class="ve-service-icon"><i class="fa fa-refresh"></i></div>
                     <h4>Not Sure Where to Start?</h4>
                     <p>Many clients come to us with unique business operational challenges. We help clarify what needs to improve, what should be built first, and what a realistic budget and timeline should look like.</p>
-                    <a href="contact.html" class="ve-card-link">Book a free session <i class="fa fa-long-arrow-right"></i></a>
+                    <a href="contact.php" class="ve-card-link">Book a free session <i class="fa fa-long-arrow-right"></i></a>
                 </div>
 
             </div>
@@ -182,7 +120,7 @@
             <div class="row align-items-center">
                 <div class="col-12 col-lg-5">
                     <div class="ve-whyus-img-wrap wow fadeInLeft" data-wow-delay="100ms">
-                        <div class="ve-whyus-img-main bg-img" style="background-image:url(img/bg-img/5.jpg);"></div>
+                        <div class="ve-whyus-img-main bg-img" style="background-image:url(<?= e(site_image('home_whyus', 'img/bg-img/5.jpg')) ?>);"></div>
                         <div class="ve-whyus-badge">
                             <strong>5+</strong>
                             <span>Years Building in Uganda</span>
@@ -218,7 +156,7 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="about.html" class="ve-btn-primary mt-30">Learn More About Us</a>
+                        <a href="about.php" class="ve-btn-primary mt-30">Learn More About Us</a>
                     </div>
                 </div>
             </div>
@@ -295,7 +233,7 @@
     </section>
 
     <!-- ===== CTA BANNER ===== -->
-    <section class="ve-cta-banner bg-img" style="background-image:url(img/bg-img/6.jpg);">
+    <section class="ve-cta-banner bg-img" style="background-image:url(<?= e(site_image('cta_banner', 'img/bg-img/6.jpg')) ?>);">
         <div class="ve-cta-overlay"></div>
         <div class="container ve-cta-content">
             <div class="row align-items-center">
@@ -304,7 +242,7 @@
                     <p>Whether it's chaotic record management, bottlenecked approvals, missing insights, inventory nightmares, or operations hanging on one person's shoulders we've solved it before. Let us show you what's truly possible and exactly what it takes to get there.</p>
                 </div>
                 <div class="col-12 col-lg-4 text-lg-right">
-                    <a href="contact.html" class="ve-btn-white">Let's Talk - It's Free</a>
+                    <a href="contact.php" class="ve-btn-white">Let's Talk - It's Free</a>
                 </div>
             </div>
         </div>
@@ -314,7 +252,7 @@
     <section class="ve-section ve-insights-section">
         <div class="container">
             <div class="ve-section-header text-center">
-                <span class="ve-section-tag">Insights & Knowledge</span>
+                <span class="ve-section-tag">Insights &amp; Knowledge</span>
                 <h2>Business Clarity Through <span>Practical Knowledge</span></h2>
                 <p>Real strategies without the tech jargon. Learn how successful organizations leverage technology to solve actual challenges, streamline operations, and scale sustainably.</p>
             </div>
@@ -322,7 +260,7 @@
 
                 <div class="col-12 col-md-4 wow fadeInUp" data-wow-delay="100ms">
                     <div class="ve-insight-card">
-                        <div class="ve-insight-img bg-img" style="background-image:url(img/bg-img/10.jpg);"></div>
+                        <div class="ve-insight-img bg-img" style="background-image:url(<?= e(site_image('insight_1', 'img/bg-img/10.jpg')) ?>);"></div>
                         <div class="ve-insight-body">
                             <span class="ve-insight-cat">Custom Software</span>
                             <h5><a href="single-post.html">Why "There's an App for That" Is Usually the Wrong Answer for Your Business</a></h5>
@@ -337,7 +275,7 @@
 
                 <div class="col-12 col-md-4 wow fadeInUp" data-wow-delay="250ms">
                     <div class="ve-insight-card">
-                        <div class="ve-insight-img bg-img" style="background-image:url(img/bg-img/11.jpg);"></div>
+                        <div class="ve-insight-img bg-img" style="background-image:url(<?= e(site_image('insight_2', 'img/bg-img/11.jpg')) ?>);"></div>
                         <div class="ve-insight-body">
                             <span class="ve-insight-cat">Automation</span>
                             <h5><a href="single-post.html">The Three Things Every Business in Uganda Should Automate First</a></h5>
@@ -352,7 +290,7 @@
 
                 <div class="col-12 col-md-4 wow fadeInUp" data-wow-delay="400ms">
                     <div class="ve-insight-card">
-                        <div class="ve-insight-img bg-img" style="background-image:url(img/bg-img/12.jpg);"></div>
+                        <div class="ve-insight-img bg-img" style="background-image:url(<?= e(site_image('insight_3', 'img/bg-img/12.jpg')) ?>);"></div>
                         <div class="ve-insight-body">
                             <span class="ve-insight-cat">Getting Started</span>
                             <h5><a href="single-post.html">How Much Does It Really Cost to Build a System? An Honest Breakdown</a></h5>
@@ -390,87 +328,4 @@
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="ve-footer">
-        <div class="container">
-            <div class="row">
-
-                <div class="col-12 col-sm-6 col-lg-4 mb-50">
-                    <div class="ve-footer-brand">
-                        <a href="index.html" class="ve-footer-logo">
-                            <span class="ve-logo-icon">
-                                <img src="img/core-img/logo.png" alt="Amex Innovations">
-                            </span>
-                            <span class="ve-logo-text">Amex <strong>Innovations</strong></span>
-                        </a>
-                        <p>We build practical software, SaaS platforms, websites, IoT tools, and management systems that help organizations across Uganda work clearly, serve people better, and grow with confidence.</p>
-                        <div class="ve-social">
-                            <a href="#" title="Facebook"><i class="fa fa-facebook"></i></a>
-                            <a href="#" title="Twitter / X"><i class="fa fa-twitter"></i></a>
-                            <a href="#" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
-                            <a href="#" title="Instagram"><i class="fa fa-instagram"></i></a>
-                            <a href="#" title="WhatsApp"><i class="fa fa-whatsapp"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-sm-6 col-lg-2 mb-50">
-                    <h5 class="ve-footer-title">Quick Links</h5>
-                    <ul class="ve-footer-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="services.html">Services</a></li>
-                        <li><a href="projects.html">Projects</a></li>
-                        <li><a href="post.html">Blog &amp; Insights</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-12 col-sm-6 col-lg-3 mb-50">
-                    <h5 class="ve-footer-title">What We Build</h5>
-                    <ul class="ve-footer-links">
-                        <li><a href="services.html">Custom Software Systems</a></li>
-                        <li><a href="services.html">Business Automation Tools</a></li>
-                        <li><a href="services.html">Websites &amp; Online Stores</a></li>
-                        <li><a href="services.html">POS &amp; Inventory Systems</a></li>
-                        <li><a href="services.html">Dashboards &amp; Reports</a></li>
-                        <li><a href="services.html">Church, School &amp; NGO Systems</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-12 col-sm-6 col-lg-3 mb-50">
-                    <h5 class="ve-footer-title">Reach Us</h5>
-                    <ul class="ve-footer-contact">
-                        <li><i class="fa fa-map-marker"></i> Mbarara City, Uganda</li>
-                        <li><i class="fa fa-phone"></i> +256 779 008858</li>
-                        <li><i class="fa fa-whatsapp"></i> +256 779 008858 (WhatsApp)</li>
-                        <li><i class="fa fa-envelope"></i> amexinnovationslt@gmail.com</li>
-                        <li><i class="fa fa-clock-o"></i> Mon - Fri | 8am - 6pm EAT</li>
-                    </ul>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="ve-footer-bottom">
-            <div class="container">
-                <div class="ve-footer-bottom-inner">
-                    <p>&copy; <script>document.write(new Date().getFullYear());</script> Amex Innovations Ltd. All rights reserved. Mbarara, Uganda.</p>
-                    <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Use</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="js/jquery/jquery-2.2.4.min.js"></script>
-    <script src="js/bootstrap/popper.min.js"></script>
-    <script src="js/bootstrap/bootstrap.min.js"></script>
-    <script src="js/plugins/plugins.js"></script>
-    <script src="js/active.js"></script>
-    <script src="js/vaultedge.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/includes/footer.php'; ?>

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /config.php
+Disallow: /config.sample.php
+Disallow: /schema.sql
+Disallow: /contact-submit.php
+
+Sitemap: https://amexinnovations.com/sitemap.xml

@@ -1,56 +1,506 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/includes/functions.php';
 
-function respond($ok, $msg) {
-    echo json_encode(['success' => $ok, 'message' => $msg]);
-    exit;
-}
+$active = 'contact';
+$page_title = 'Contact Us — Amex Innovations Ltd';
+$page_description = 'Contact Amex Innovations Ltd in Mbarara, Uganda to discuss custom software, SaaS platforms, IoT systems, websites, dashboards, and digital agriculture projects.';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    respond(false, 'Invalid request method.');
-}
+$company_email = setting('company_email', 'amexinnovationslt@gmail.com');
+$company_phone = setting('company_phone', '+256 779 008858');
+$whatsapp_number = preg_replace('/\D/', '', $company_phone);
+$facebook_url  = setting('facebook_url', '#');
+$twitter_url   = setting('twitter_url', '#');
+$linkedin_url  = setting('linkedin_url', '#');
+$instagram_url = setting('instagram_url', '#');
 
-// Honeypot — bots fill hidden fields
-if (!empty($_POST['hp'])) {
-    respond(true, 'Thank you!');
-}
+require __DIR__ . '/includes/header.php';
+?>
+<style>
+    /* ── Contact Info Cards ── */
+    .amex-contact-cards {
+        background: var(--ve-light);
+        padding: 60px 0 80px;
+    }
+    .amex-ci-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+        margin-bottom: 0;
+    }
+    .amex-ci-card {
+        background: #fff;
+        border-radius: var(--ve-radius);
+        box-shadow: var(--ve-shadow);
+        padding: 36px 28px;
+        text-align: center;
+        transition: var(--ve-trans);
+        position: relative;
+        overflow: hidden;
+    }
+    .amex-ci-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0D47A1, #E64A19);
+    }
+    .amex-ci-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(7,23,48,0.15); }
+    .amex-ci-icon {
+        width: 56px; height: 56px;
+        background: linear-gradient(135deg, #0D47A1, #1976D2);
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 16px;
+        color: #fff; font-size: 22px;
+    }
+    .amex-ci-card h5 { font-size: 17px; font-weight: 700; color: var(--ve-dark); margin-bottom: 8px; }
+    .amex-ci-card p  { font-size: 13px; color: var(--ve-text); margin: 0; line-height: 1.6; overflow-wrap: break-word; }
+    .amex-ci-card a  { color: var(--ve-text); text-decoration: none; overflow-wrap: break-word; }
+    .amex-ci-card a:hover { color: var(--ve-gold); }
 
-$name    = trim($_POST['name']    ?? '');
-$email   = trim($_POST['email']   ?? '');
-$phone   = trim($_POST['phone']   ?? '');
-$service = trim($_POST['service'] ?? '');
-$message = trim($_POST['message'] ?? '');
+    /* ── WhatsApp banner ── */
+    .amex-wa-bar {
+        background: linear-gradient(135deg, #075e54, #128c7e);
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: var(--ve-radius);
+        display: flex; align-items: center; gap: 14px;
+        margin-bottom: 32px;
+        text-decoration: none;
+        transition: var(--ve-trans);
+    }
+    .amex-wa-bar:hover { opacity: .9; color: #fff; text-decoration: none; }
+    .amex-wa-bar i { font-size: 26px; }
+    .amex-wa-bar span { font-size: 15px; font-weight: 600; }
+    .amex-wa-bar small { font-size: 13px; opacity: .85; display: block; font-weight: 400; }
 
-if ($name === '' || $email === '' || $message === '') {
-    respond(false, 'Please fill in your name, email and message.');
-}
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    respond(false, 'Please enter a valid email address.');
-}
-if (strlen($message) < 10) {
-    respond(false, 'Your message is too short — please give us a bit more detail.');
-}
+    /* ── Main contact section ── */
+    .amex-contact-main { padding: 60px 0 80px; }
 
-$to      = 'amexinnovationslt@gmail.com';
-$subject = 'New enquiry from Amex website' . ($service ? ' — ' . $service : '');
-$body    = "Name:    {$name}\n"
-         . "Email:   {$email}\n"
-         . "Phone:   {$phone}\n"
-         . "Service: {$service}\n\n"
-         . "Message:\n{$message}\n\n"
-         . "-- Sent from amexinnovations.com";
+    /* ── Form ── */
+    .amex-form-wrap {
+        background: #fff;
+        border-radius: var(--ve-radius);
+        box-shadow: var(--ve-shadow);
+        padding: 48px 44px;
+    }
+    .amex-form-wrap h2 { font-size: 32px; font-weight: 800; color: var(--ve-dark); margin-bottom: 8px; }
+    .amex-form-wrap > p { font-size: 15px; color: var(--ve-text); margin-bottom: 32px; }
 
-$headers = implode("\r\n", [
-    "From: Amex Website <no-reply@amexinnovations.com>",
-    "Reply-To: {$name} <{$email}>",
-    "MIME-Version: 1.0",
-    "Content-Type: text/plain; charset=UTF-8",
-]);
+    .amex-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media(max-width:640px) { .amex-form-row { grid-template-columns: 1fr; } .amex-form-wrap { padding: 32px 20px; } }
 
-$sent = @mail($to, $subject, $body, $headers);
+    .amex-fg { display: flex; flex-direction: column; margin-bottom: 20px; }
+    .amex-fg label { font-size: 13px; font-weight: 700; color: var(--ve-dark); margin-bottom: 6px; letter-spacing: .4px; text-transform: uppercase; }
+    .amex-fg label .req { color: var(--ve-gold); margin-left: 2px; }
+    .amex-fg input,
+    .amex-fg select,
+    .amex-fg textarea {
+        border: 2px solid var(--ve-border);
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 14px;
+        color: var(--ve-dark);
+        background: #fafbfd;
+        transition: border-color .2s, box-shadow .2s;
+        outline: none;
+        font-family: inherit;
+        width: 100%;
+    }
+    .amex-fg input:focus,
+    .amex-fg select:focus,
+    .amex-fg textarea:focus {
+        border-color: #1976D2;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(25,118,210,.08);
+    }
+    .amex-fg input.is-error,
+    .amex-fg select.is-error,
+    .amex-fg textarea.is-error {
+        border-color: #e53935;
+        box-shadow: 0 0 0 4px rgba(229,57,53,.08);
+    }
+    .amex-fg input.is-valid,
+    .amex-fg select.is-valid,
+    .amex-fg textarea.is-valid {
+        border-color: #43a047;
+    }
+    .amex-field-error { font-size: 12px; color: #e53935; margin-top: 5px; display: none; }
+    .amex-field-error.show { display: block; }
 
-if ($sent) {
-    respond(true, "Thanks {$name}! We received your message and will get back to you within 24 hours.");
-} else {
-    respond(false, 'We could not send your message right now. Please email us directly at amexinnovationslt@gmail.com or call +256 779 008858.');
-}
+    .amex-fg textarea { resize: vertical; min-height: 130px; }
+    .amex-fg select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5568' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
+    .amex-hp { display: none; }
+
+    /* Submit button */
+    .amex-submit-btn {
+        display: inline-flex; align-items: center; gap: 10px;
+        background: linear-gradient(135deg, #0D47A1, #1976D2);
+        color: #fff;
+        border: none; border-radius: 8px;
+        padding: 14px 36px;
+        font-size: 15px; font-weight: 700;
+        cursor: pointer;
+        transition: var(--ve-trans);
+        width: 100%;
+        justify-content: center;
+        letter-spacing: .3px;
+    }
+    .amex-submit-btn:hover:not(:disabled) { background: linear-gradient(135deg, #0a3d8e, #1565c0); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(13,71,161,.35); }
+    .amex-submit-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+    /* Spinner */
+    .amex-spinner {
+        width: 18px; height: 18px;
+        border: 3px solid rgba(255,255,255,.35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast / feedback */
+    .amex-toast {
+        display: none;
+        padding: 16px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .amex-toast.show { display: flex; }
+    .amex-toast.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .amex-toast.error   { background: #fdecea; color: #c62828; border: 1px solid #ef9a9a; }
+    .amex-toast i { font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+
+    /* ── Aside panel ── */
+    .amex-aside { display: flex; flex-direction: column; gap: 24px; }
+
+    .amex-aside-box {
+        background: #fff;
+        border-radius: var(--ve-radius);
+        box-shadow: var(--ve-shadow);
+        padding: 28px;
+    }
+    .amex-aside-box h4 { font-size: 18px; font-weight: 800; color: var(--ve-dark); margin-bottom: 16px; }
+    .amex-aside-box h5 { font-size: 15px; font-weight: 700; color: var(--ve-dark); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .amex-aside-box h5 i { color: var(--ve-gold); }
+
+    .amex-reasons li {
+        display: flex; align-items: flex-start; gap: 10px;
+        font-size: 14px; color: var(--ve-text);
+        padding: 8px 0; border-bottom: 1px solid var(--ve-border);
+        list-style: none;
+    }
+    .amex-reasons li:last-child { border-bottom: none; }
+    .amex-reasons li i { color: #43a047; margin-top: 2px; flex-shrink: 0; }
+
+    .amex-hours li {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 9px 0; border-bottom: 1px dashed var(--ve-border);
+        font-size: 13px; list-style: none;
+    }
+    .amex-hours li:last-child { border-bottom: none; }
+    .amex-hours li span { color: var(--ve-text); }
+    .amex-hours li strong { color: var(--ve-dark); }
+
+    .amex-social-links { display: flex; gap: 12px; flex-wrap: wrap; }
+    .amex-social-links a {
+        width: 40px; height: 40px;
+        background: var(--ve-light);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--ve-dark); font-size: 16px;
+        transition: var(--ve-trans); text-decoration: none;
+    }
+    .amex-social-links a:hover { background: linear-gradient(135deg,#0D47A1,#1976D2); color: #fff; }
+
+    /* ── Map ── */
+    .amex-map-section { padding: 0 0 80px; }
+    .amex-map-wrap {
+        border-radius: var(--ve-radius);
+        overflow: hidden;
+        box-shadow: var(--ve-shadow);
+        height: 380px;
+    }
+    .amex-map-wrap iframe { width: 100%; height: 100%; border: 0; }
+</style>
+
+    <!-- ═══════════════════════════ PAGE HERO ═══════════════════════════ -->
+    <section class="ve-page-hero" style="background:linear-gradient(135deg,#071730 0%,#0D47A1 100%);">
+        <div class="ve-page-hero-overlay" style="background:rgba(7,23,48,.55);"></div>
+        <div class="container ve-page-hero-content">
+            <span class="ve-section-tag">Get In Touch</span>
+            <h1>Tell Us What You Need to <span>Build or Improve.</span></h1>
+            <p style="color:rgba(255,255,255,.8);font-size:17px;max-width:540px;margin:16px auto 0;">Whether you need a new system, a better website, an automation plan, or advice on where to start, our team will give you a clear next step.</p>
+            <nav aria-label="breadcrumb"><ol class="ve-breadcrumb"><li><a href="index.php">Home</a></li><li class="active">Contact</li></ol></nav>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════ CONTACT CARDS ═══════════════════════════ -->
+    <section class="amex-contact-cards mb-3">
+        <div class="container mb-3">
+            <div class="amex-ci-grid">
+                <div class="amex-ci-card wow fadeInUp" data-wow-delay="100ms">
+                    <div class="amex-ci-icon"><i class="fa fa-map-marker"></i></div>
+                    <h5>Location</h5>
+                    <p><?= e(setting('company_address', 'Mbarara City, Uganda')) ?><br><small>Western Region</small></p>
+                </div>
+                <div class="amex-ci-card wow fadeInUp" data-wow-delay="200ms">
+                    <div class="amex-ci-icon"><i class="fa fa-phone"></i></div>
+                    <h5>Call or WhatsApp</h5>
+                    <p><a href="tel:<?= e(preg_replace('/\s+/', '', $company_phone)) ?>"><?= e($company_phone) ?></a></p>
+                </div>
+                <div class="amex-ci-card wow fadeInUp" data-wow-delay="300ms">
+                    <div class="amex-ci-icon"><i class="fa fa-envelope"></i></div>
+                    <h5>Email Us</h5>
+                    <p><a href="mailto:<?= e($company_email) ?>"><?= e($company_email) ?></a><br><small>We reply within 24 hours</small></p>
+                </div>
+                <div class="amex-ci-card wow fadeInUp" data-wow-delay="400ms">
+                    <div class="amex-ci-icon"><i class="fa fa-clock-o"></i></div>
+                    <h5>Working Hours</h5>
+                    <p>Mon – Fri: 8am – 6pm<br>Sat: 9am – 1pm</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════ MAIN CONTACT ═══════════════════════════ -->
+    <section class="amex-contact-main">
+        <div class="container">
+            <div class="row">
+
+                <!-- FORM COLUMN -->
+                <div class="col-12 col-lg-7 wow fadeInLeft" data-wow-delay="100ms">
+
+                    <!-- WhatsApp quick-link -->
+                    <a href="https://wa.me/<?= e($whatsapp_number) ?>?text=Hi%20Amex%20Innovations%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" class="amex-wa-bar">
+                        <i class="fa fa-whatsapp"></i>
+                        <div>
+                            <span>Chat on WhatsApp — fastest response</span>
+                            <small>Tap to open a conversation with our team</small>
+                        </div>
+                        <i class="fa fa-arrow-right" style="margin-left:auto;font-size:16px;opacity:.7;"></i>
+                    </a>
+
+                    <div class="amex-form-wrap">
+                        <span class="ve-section-tag">Send a Message</span>
+                        <h2>Tell Us About <span style="color:var(--ve-gold);">Your Project</span></h2>
+                        <p>You can send a detailed brief or simply explain the problem. We will help translate it into a practical technology plan.</p>
+
+                        <!-- Toast feedback -->
+                        <div class="amex-toast" id="amex-toast">
+                            <i class="fa fa-check-circle" id="toast-icon"></i>
+                            <span id="toast-msg"></span>
+                        </div>
+
+                        <form id="amex-contact-form" novalidate>
+                            <!-- Honeypot -->
+                            <div class="amex-hp"><input type="text" name="hp" tabindex="-1" autocomplete="off"></div>
+
+                            <div class="amex-form-row">
+                                <div class="amex-fg">
+                                    <label>Full Name <span class="req">*</span></label>
+                                    <input type="text" name="name" id="f-name" placeholder="e.g. John Mugisha" autocomplete="name">
+                                    <span class="amex-field-error" id="err-name">Please enter your name.</span>
+                                </div>
+                                <div class="amex-fg">
+                                    <label>Email Address <span class="req">*</span></label>
+                                    <input type="email" name="email" id="f-email" placeholder="you@example.com" autocomplete="email">
+                                    <span class="amex-field-error" id="err-email">Please enter a valid email.</span>
+                                </div>
+                            </div>
+
+                            <div class="amex-form-row">
+                                <div class="amex-fg">
+                                    <label>Phone / WhatsApp</label>
+                                    <input type="tel" name="phone" id="f-phone" placeholder="+256 7XX XXX XXX" autocomplete="tel">
+                                </div>
+                                <div class="amex-fg">
+                                    <label>Service You Need</label>
+                                    <select name="service" id="f-service">
+                                        <option value="">— Select a service —</option>
+                                        <option>SaaS / Web Application Development</option>
+                                        <option>IoT &amp; Embedded Systems</option>
+                                        <option>Custom Software Development</option>
+                                        <option>Digital Agriculture Tools (FarmEase)</option>
+                                        <option>Lab / Healthcare Systems (LabTrack / IIS)</option>
+                                        <option>Tech Consulting &amp; Discovery</option>
+                                        <option>Research &amp; Innovation</option>
+                                        <option>Something else</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="amex-fg">
+                                <label>Your Message <span class="req">*</span></label>
+                                <textarea name="message" id="f-message" placeholder="Describe what you're trying to build or solve. The more detail you give, the faster we can respond with a useful answer."></textarea>
+                                <span class="amex-field-error" id="err-message">Please describe what you need (at least 10 characters).</span>
+                            </div>
+
+                            <button type="submit" class="amex-submit-btn" id="amex-submit">
+                                <span id="btn-label">Send Message</span>
+                                <i class="fa fa-paper-plane" id="btn-icon"></i>
+                                <div class="amex-spinner" id="btn-spinner"></div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ASIDE COLUMN -->
+                <div class="col-12 col-lg-5 wow fadeInRight" data-wow-delay="200ms">
+                    <div class="amex-aside">
+
+                        <div class="amex-aside-box">
+                            <h4>Why Teams Work with Amex</h4>
+                            <ul class="amex-reasons">
+                                <li><i class="fa fa-check-circle"></i> We respond within 24 hours with a clear next step</li>
+                                <li><i class="fa fa-check-circle"></i> Free discovery call before any commitment</li>
+                                <li><i class="fa fa-check-circle"></i> Built for African operating contexts and local realities</li>
+                                <li><i class="fa fa-check-circle"></i> Transparent pricing — no surprise charges after sign-off</li>
+                                <li><i class="fa fa-check-circle"></i> Post-delivery support included in every project</li>
+                            </ul>
+                        </div>
+
+                        <div class="amex-aside-box">
+                            <h5><i class="fa fa-clock-o"></i> Office Hours</h5>
+                            <ul class="amex-hours">
+                                <li><span>Monday – Friday</span><strong>8:00 AM – 6:00 PM</strong></li>
+                                <li><span>Saturday</span><strong>9:00 AM – 1:00 PM</strong></li>
+                                <li><span>Sunday</span><strong>Closed</strong></li>
+                            </ul>
+                            <p style="font-size:13px;color:var(--ve-text);margin-top:12px;margin-bottom:0;"><i class="fa fa-info-circle" style="color:var(--ve-gold);"></i> &nbsp;Outside hours? Send a WhatsApp message or email and we will respond as soon as possible.</p>
+                        </div>
+
+                        <div class="amex-aside-box">
+                            <h5>Follow Our Work</h5>
+                            <div class="amex-social-links">
+                                <a href="<?= e($facebook_url) ?>" title="Facebook"><i class="fa fa-facebook"></i></a>
+                                <a href="<?= e($twitter_url) ?>" title="Twitter / X"><i class="fa fa-twitter"></i></a>
+                                <a href="<?= e($linkedin_url) ?>" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
+                                <a href="<?= e($instagram_url) ?>" title="Instagram"><i class="fa fa-instagram"></i></a>
+                                <a href="https://wa.me/<?= e($whatsapp_number) ?>" target="_blank" title="WhatsApp"><i class="fa fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════ MAP ═══════════════════════════ -->
+    <section class="amex-map-section">
+        <div class="container">
+            <div class="amex-map-wrap wow fadeInUp" data-wow-delay="100ms">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63836.58437854!2d30.621!3d-0.606!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19d8740ef2e76c5b%3A0xbbf9f3db4f81e127!2sMbarara%2C%20Uganda!5e0!3m2!1sen!2sug!4v1716000000000"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Amex Innovations — Mbarara, Uganda">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+<script>
+(function () {
+    const form    = document.getElementById('amex-contact-form');
+    const btn     = document.getElementById('amex-submit');
+    const btnLbl  = document.getElementById('btn-label');
+    const btnIcon = document.getElementById('btn-icon');
+    const spinner = document.getElementById('btn-spinner');
+    const toast   = document.getElementById('amex-toast');
+    const toastMsg  = document.getElementById('toast-msg');
+    const toastIcon = document.getElementById('toast-icon');
+
+    const fName    = document.getElementById('f-name');
+    const fEmail   = document.getElementById('f-email');
+    const fMessage = document.getElementById('f-message');
+
+    function validate(field, errId, check) {
+        field.addEventListener('blur', () => {
+            const ok = check(field.value.trim());
+            field.classList.toggle('is-error', !ok);
+            field.classList.toggle('is-valid', ok);
+            document.getElementById(errId).classList.toggle('show', !ok);
+        });
+        field.addEventListener('input', () => {
+            if (field.classList.contains('is-error')) {
+                const ok = check(field.value.trim());
+                if (ok) {
+                    field.classList.remove('is-error');
+                    field.classList.add('is-valid');
+                    document.getElementById(errId).classList.remove('show');
+                }
+            }
+        });
+    }
+
+    validate(fName,    'err-name',    v => v.length >= 2);
+    validate(fEmail,   'err-email',   v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));
+    validate(fMessage, 'err-message', v => v.length >= 10);
+
+    function showToast(ok, msg) {
+        toast.className = 'amex-toast show ' + (ok ? 'success' : 'error');
+        toastIcon.className = ok ? 'fa fa-check-circle' : 'fa fa-exclamation-circle';
+        toastMsg.textContent = msg;
+        toast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function setLoading(on) {
+        btn.disabled = on;
+        btnLbl.textContent = on ? 'Sending…' : 'Send Message';
+        btnIcon.style.display = on ? 'none' : 'inline';
+        spinner.style.display = on ? 'block' : 'none';
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        let valid = true;
+
+        [[fName, 'err-name', v => v.length >= 2],
+         [fEmail, 'err-email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)],
+         [fMessage, 'err-message', v => v.length >= 10]
+        ].forEach(([field, errId, check]) => {
+            const ok = check(field.value.trim());
+            field.classList.toggle('is-error', !ok);
+            field.classList.toggle('is-valid', ok);
+            document.getElementById(errId).classList.toggle('show', !ok);
+            if (!ok) valid = false;
+        });
+
+        if (!valid) {
+            showToast(false, 'Please fix the highlighted fields before sending.');
+            return;
+        }
+
+        setLoading(true);
+        toast.className = 'amex-toast';
+
+        const data = new FormData(form);
+
+        fetch('contact-submit.php', { method: 'POST', body: data })
+            .then(r => r.json())
+            .then(res => {
+                showToast(res.success, res.message);
+                if (res.success) {
+                    form.reset();
+                    form.querySelectorAll('.is-valid').forEach(el => el.classList.remove('is-valid'));
+                }
+            })
+            .catch(() => {
+                showToast(false, 'Network error. Please email us directly at <?= e($company_email) ?> or call <?= e($company_phone) ?>.');
+            })
+            .finally(() => setLoading(false));
+    });
+})();
+</script>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>
