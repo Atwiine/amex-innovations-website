@@ -9,6 +9,8 @@ $pages = [
     ['path' => 'services.php', 'priority' => '0.9', 'changefreq' => 'monthly'],
     ['path' => 'projects.php', 'priority' => '0.9', 'changefreq' => 'monthly'],
     ['path' => 'contact.php',  'priority' => '0.7', 'changefreq' => 'monthly'],
+    ['path' => 'privacy.php',  'priority' => '0.2', 'changefreq' => 'yearly'],
+    ['path' => 'terms.php',    'priority' => '0.2', 'changefreq' => 'yearly'],
 ];
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";

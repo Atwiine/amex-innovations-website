@@ -42,9 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt = db()->prepare('UPDATE team_members SET name=?, role=?, bio=?, social1_platform=?, social1_url=?, social2_platform=?, social2_url=?, sort_order=?, is_active=? WHERE id=?');
                     $stmt->execute([$name, $role, $bio, $social1Platform, $social1Url, $social2Platform, $social2Url, $sort, $active, $id]);
                 }
+                log_action('team_update', $name);
             } else {
                 $stmt = db()->prepare('INSERT INTO team_members (name, role, bio, photo, social1_platform, social1_url, social2_platform, social2_url, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?)');
                 $stmt->execute([$name, $role, $bio, $photoPath ?: 'img/core-img/logo.png', $social1Platform, $social1Url, $social2Platform, $social2Url, $sort, $active]);
+                log_action('team_create', $name);
             }
             header('Location: team.php?saved=1');
             exit;
@@ -57,7 +59,12 @@ if (isset($_GET['delete'])) {
         http_response_code(400);
         die('Invalid request.');
     }
-    db()->prepare('DELETE FROM team_members WHERE id = ?')->execute([(int) $_GET['delete']]);
+    $deleteId = (int) $_GET['delete'];
+    $target = db()->prepare('SELECT name FROM team_members WHERE id = ?');
+    $target->execute([$deleteId]);
+    $target = $target->fetch();
+    db()->prepare('DELETE FROM team_members WHERE id = ?')->execute([$deleteId]);
+    log_action('team_delete', $target['name'] ?? "#$deleteId");
     header('Location: team.php?deleted=1');
     exit;
 }

@@ -6,6 +6,7 @@ require_admin();
 $fields = [
     'company_email'   => 'Company Email',
     'company_phone'   => 'Company Phone (used for calls & WhatsApp)',
+    'company_phone_2' => 'Second Phone (display only, no WhatsApp link — leave blank to hide)',
     'company_address' => 'Company Address',
     'facebook_url'    => 'Facebook URL',
     'twitter_url'     => 'Twitter / X URL',
@@ -25,11 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = db()->prepare('INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)');
     // Only update keys that were actually part of the submitted form
     // (the page has two separate forms, each covering a subset of settings).
+    $changedKeys = [];
     foreach (array_keys($fields + $seoFields) as $key) {
         if (array_key_exists($key, $_POST)) {
             $stmt->execute([$key, trim($_POST[$key])]);
+            $changedKeys[] = $key;
         }
     }
+    log_action('settings_update', implode(', ', $changedKeys));
     header('Location: settings.php?saved=1');
     exit;
 }

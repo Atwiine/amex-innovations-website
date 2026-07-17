@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $path = upload_image('image', 'site', 1920, $quality);
             if ($path) {
                 db()->prepare('UPDATE site_images SET path = ? WHERE image_key = ?')->execute([$path, $key]);
+                log_action('image_replace', $row['label']);
                 header('Location: images.php?saved=1');
                 exit;
             }

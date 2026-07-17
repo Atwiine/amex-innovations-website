@@ -5,6 +5,8 @@ $active = 'home';
 $page_title = 'Amex Innovations Ltd - Practical Software for Growing Organizations';
 $page_description = 'Amex Innovations Ltd builds practical software, management systems, SaaS platforms, IoT tools, and digital solutions for businesses and organizations across Uganda.';
 require __DIR__ . '/includes/header.php';
+
+$partners = db()->query('SELECT * FROM partners WHERE is_active = 1 ORDER BY sort_order ASC')->fetchAll();
 ?>
 
     <!-- ===== HERO ===== -->
@@ -36,7 +38,7 @@ require __DIR__ . '/includes/header.php';
         </div>
         <div class="ve-hero-right">
             <div class="ve-hero-img-main bg-img" style="background-image:url(<?= e(site_image('home_hero_main', 'img/bg-img/1.jpg')) ?>);"></div>
-            <div class="ve-hero-img-accent bg-img" style="background-image:url(<?= e(site_image('home_hero_accent', 'img/bg-img/3.jpg')) ?>);"></div>
+            <!-- <div class="ve-hero-img-accent bg-img" style="background-image:url(<?= e(site_image('home_hero_accent', 'img/bg-img/3.jpg')) ?>);"></div> -->
             <div class="ve-float-card">
                 <i class="fa fa-check-circle" style="color:#E64A19;"></i>
                 <div>
@@ -191,46 +193,30 @@ require __DIR__ . '/includes/header.php';
         </div>
     </section>
 
-    <!-- ===== CLIENT STORIES ===== -->
-    <section class="ve-section ve-testimonials-section">
+    <?php if ($partners): ?>
+    <!-- ===== PARTNERS ===== -->
+    <section class="ve-section" style="background:var(--ve-light); padding:70px 0;">
         <div class="container">
             <div class="ve-section-header text-center">
-                <span class="ve-section-tag">Client Stories</span>
-                <h2>Real Results When <span>the Right System</span> Is Implemented</h2>
-                <p>Stories from clients that illustrate common operational challenges—and how a simple, well-designed digital solution improved efficiency, transparency, and outcomes.</p>
+                <span class="ve-section-tag">Who We've Worked With</span>
+                <h2>Our <span>Partners</span></h2>
             </div>
-            <div class="ve-testi-grid">
-
-                <div class="ve-testi-card wow fadeInUp" data-wow-delay="100ms">
-                    <div class="ve-testi-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                    <p>"We were running our entire shop on handwritten receipts and a single Excel file shared on WhatsApp. Stock was always wrong, and we never knew our actual profits. Amex built us an inventory and POS system — now everything balances, and I can see my daily sales on my phone."</p>
-                    <div class="ve-testi-author">
-                        <div class="ve-testi-avatar"><strong>John Mwale</strong></div>
-                        <div><strong>TechMart Solutions</strong><span>Retail Business</span></div>
-                    </div>
-                </div>
-
-                <div class="ve-testi-card wow fadeInUp" data-wow-delay="250ms">
-                    <div class="ve-testi-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                    <p>"Tracking medical equipment across our departments was a constant headache. Things would go missing and we had no clear record of where anything was. The system Amex built solved that completely — every item is logged, located, and accounted for. It was exactly what we described, and then some."</p>
-                    <div class="ve-testi-author">
-                            <div class="ve-testi-avatar"><strong>Dr. Sarah Kipchoge</strong></div>
-                        <div><strong>Riverside Medical Center</strong><span>Healthcare</span></div>
-                    </div>
-                </div>
-
-                <div class="ve-testi-card wow fadeInUp" data-wow-delay="400ms">
-                    <div class="ve-testi-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                    <p>"Our membership records, tithes, and attendance were all in different notebooks and different people's phones. It was disorganized and embarrassing. Amex built us a church management system that handles everything in one place. Our team actually enjoys using it — and that says a lot."</p>
-                    <div class="ve-testi-author">
-                        <div class="ve-testi-avatar"><strong>Pastor David Mutua</strong></div>
-                        <div><strong>Grace Community Church</strong><span>Religious Organization</span></div>
-                    </div>
-                </div>
-
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:36px;">
+                <?php foreach ($partners as $p):
+                    $inner = $p['logo']
+                        ? '<img src="' . e($p['logo']) . '" alt="' . e($p['name']) . '" style="max-height:56px; max-width:160px; object-fit:contain; filter:grayscale(100%); opacity:.75; transition:filter .2s, opacity .2s;" onmouseover="this.style.filter=\'none\';this.style.opacity=1;" onmouseout="this.style.filter=\'grayscale(100%)\';this.style.opacity=.75;">'
+                        : '<span style="font-size:16px; font-weight:700; color:var(--ve-dark);">' . e($p['name']) . '</span>';
+                ?>
+                    <?php if ($p['website_url']): ?>
+                        <a href="<?= e($p['website_url']) ?>" target="_blank" rel="noopener"><?= $inner ?></a>
+                    <?php else: ?>
+                        <?= $inner ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
     <!-- ===== CTA BANNER ===== -->
     <section class="ve-cta-banner bg-img" style="background-image:url(<?= e(site_image('cta_banner', 'img/bg-img/6.jpg')) ?>);">
@@ -244,65 +230,6 @@ require __DIR__ . '/includes/header.php';
                 <div class="col-12 col-lg-4 text-lg-right">
                     <a href="contact.php" class="ve-btn-white">Let's Talk - It's Free</a>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== INSIGHTS ===== -->
-    <section class="ve-section ve-insights-section">
-        <div class="container">
-            <div class="ve-section-header text-center">
-                <span class="ve-section-tag">Insights &amp; Knowledge</span>
-                <h2>Business Clarity Through <span>Practical Knowledge</span></h2>
-                <p>Real strategies without the tech jargon. Learn how successful organizations leverage technology to solve actual challenges, streamline operations, and scale sustainably.</p>
-            </div>
-            <div class="row">
-
-                <div class="col-12 col-md-4 wow fadeInUp" data-wow-delay="100ms">
-                    <div class="ve-insight-card">
-                        <div class="ve-insight-img bg-img" style="background-image:url(<?= e(site_image('insight_1', 'img/bg-img/10.jpg')) ?>);"></div>
-                        <div class="ve-insight-body">
-                            <span class="ve-insight-cat">Custom Software</span>
-                            <h5><a href="single-post.html">Why "There's an App for That" Is Usually the Wrong Answer for Your Business</a></h5>
-                            <p>Generic apps are built for everyone — which means they're perfect for no one. Here's when custom software actually makes sense, and when it doesn't.</p>
-                            <div class="ve-insight-meta">
-                                <span><i class="fa fa-calendar"></i> May 10, 2025</span>
-                                <a href="single-post.html">Read More <i class="fa fa-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-md-4 wow fadeInUp" data-wow-delay="250ms">
-                    <div class="ve-insight-card">
-                        <div class="ve-insight-img bg-img" style="background-image:url(<?= e(site_image('insight_2', 'img/bg-img/11.jpg')) ?>);"></div>
-                        <div class="ve-insight-body">
-                            <span class="ve-insight-cat">Automation</span>
-                            <h5><a href="single-post.html">The Three Things Every Business in Uganda Should Automate First</a></h5>
-                            <p>You don't have to automate everything at once. Start with these three areas and you'll feel the difference within the first week.</p>
-                            <div class="ve-insight-meta">
-                                <span><i class="fa fa-calendar"></i> April 28, 2025</span>
-                                <a href="single-post.html">Read More <i class="fa fa-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-md-4 wow fadeInUp" data-wow-delay="400ms">
-                    <div class="ve-insight-card">
-                        <div class="ve-insight-img bg-img" style="background-image:url(<?= e(site_image('insight_3', 'img/bg-img/12.jpg')) ?>);"></div>
-                        <div class="ve-insight-body">
-                            <span class="ve-insight-cat">Getting Started</span>
-                            <h5><a href="single-post.html">How Much Does It Really Cost to Build a System? An Honest Breakdown</a></h5>
-                            <p>One of the most common questions we get. Here's a straightforward look at what drives the cost of custom software in Uganda.</p>
-                            <div class="ve-insight-meta">
-                                <span><i class="fa fa-calendar"></i> April 15, 2025</span>
-                                <a href="single-post.html">Read More <i class="fa fa-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </section>

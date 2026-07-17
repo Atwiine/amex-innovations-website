@@ -6,7 +6,8 @@ $page_title = 'Contact Us — Amex Innovations Ltd';
 $page_description = 'Contact Amex Innovations Ltd in Mbarara, Uganda to discuss custom software, SaaS platforms, IoT systems, websites, dashboards, and digital agriculture projects.';
 
 $company_email = setting('company_email', 'amexinnovationslt@gmail.com');
-$company_phone = setting('company_phone', '+256 779 008858');
+$company_phone = setting('company_phone', '+256 705 104052');
+$company_phone_2 = setting('company_phone_2', '');
 $whatsapp_number = preg_replace('/\D/', '', $company_phone);
 $facebook_url  = setting('facebook_url', '#');
 $twitter_url   = setting('twitter_url', '#');
@@ -252,7 +253,7 @@ require __DIR__ . '/includes/header.php';
                 <div class="amex-ci-card wow fadeInUp" data-wow-delay="200ms">
                     <div class="amex-ci-icon"><i class="fa fa-phone"></i></div>
                     <h5>Call or WhatsApp</h5>
-                    <p><a href="tel:<?= e(preg_replace('/\s+/', '', $company_phone)) ?>"><?= e($company_phone) ?></a></p>
+                    <p><a href="tel:<?= e(preg_replace('/\s+/', '', $company_phone)) ?>"><?= e($company_phone) ?></a><?php if ($company_phone_2): ?><br><a href="tel:<?= e(preg_replace('/\s+/', '', $company_phone_2)) ?>"><?= e($company_phone_2) ?></a><?php endif; ?></p>
                 </div>
                 <div class="amex-ci-card wow fadeInUp" data-wow-delay="300ms">
                     <div class="amex-ci-icon"><i class="fa fa-envelope"></i></div>

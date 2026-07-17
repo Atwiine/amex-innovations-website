@@ -124,6 +124,9 @@ $services = db()->query('SELECT * FROM services WHERE is_active = 1 ORDER BY sor
                     <div class="ve-process-num">01</div>
                     <h5>Discovery Call</h5>
                     <p>We begin by listening. You explain your organization, the challenges you face, and your definition of success. We ask thoughtful questions in clear, simple language, with no sales pitch.</p>
+                </div>
+
+                <div class="ve-process-arrow"><i class="fa fa-long-arrow-right"></i></div>
 
                 <div class="ve-process-step wow fadeInUp" data-wow-delay="250ms">
                     <div class="ve-process-num">02</div>

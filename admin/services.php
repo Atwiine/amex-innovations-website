@@ -31,9 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id > 0) {
             $stmt = db()->prepare('UPDATE services SET title=?, slug=?, icon=?, summary=?, used_in=?, sort_order=?, is_active=? WHERE id=?');
             $stmt->execute([$title, $slug, $icon, $summary, $usedIn, $sort, $active, $id]);
+            log_action('service_update', $title);
         } else {
             $stmt = db()->prepare('INSERT INTO services (title, slug, icon, summary, used_in, sort_order, is_active) VALUES (?,?,?,?,?,?,?)');
             $stmt->execute([$title, $slug, $icon, $summary, $usedIn, $sort, $active]);
+            log_action('service_create', $title);
         }
         header('Location: services.php?saved=1');
         exit;
@@ -46,7 +48,12 @@ if (isset($_GET['delete'])) {
         http_response_code(400);
         die('Invalid request.');
     }
-    db()->prepare('DELETE FROM services WHERE id = ?')->execute([(int) $_GET['delete']]);
+    $deleteId = (int) $_GET['delete'];
+    $target = db()->prepare('SELECT title FROM services WHERE id = ?');
+    $target->execute([$deleteId]);
+    $target = $target->fetch();
+    db()->prepare('DELETE FROM services WHERE id = ?')->execute([$deleteId]);
+    log_action('service_delete', $target['title'] ?? "#$deleteId");
     header('Location: services.php?deleted=1');
     exit;
 }

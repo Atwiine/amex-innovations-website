@@ -21,6 +21,19 @@ CREATE TABLE IF NOT EXISTS admin_users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─────────────────────────────────────────────────────────────
+-- audit_log — records who did what in the admin panel
+-- ─────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS audit_log (
+    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    admin_id       INT UNSIGNED NULL,
+    admin_username VARCHAR(50)  NOT NULL,
+    action         VARCHAR(100) NOT NULL,
+    details        VARCHAR(255) NOT NULL DEFAULT '',
+    ip_address     VARCHAR(45)  NOT NULL DEFAULT '',
+    created_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────
 -- services
 -- ─────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS services (
@@ -46,6 +59,7 @@ CREATE TABLE IF NOT EXISTS projects (
     category     VARCHAR(30)  NOT NULL DEFAULT 'business',
     icon         VARCHAR(60)  NOT NULL DEFAULT 'fa-cog',
     header_class VARCHAR(30)  NOT NULL DEFAULT 'bg-blue',
+    image        VARCHAR(255) NULL,
     lead         TEXT         NOT NULL,
     problem      TEXT         NOT NULL,
     features     TEXT         NOT NULL,
@@ -58,6 +72,9 @@ CREATE TABLE IF NOT EXISTS projects (
     created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Existing installs created before the `image` column existed:
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS image VARCHAR(255) NULL AFTER header_class;
 
 -- ─────────────────────────────────────────────────────────────
 -- team_members
@@ -76,6 +93,20 @@ CREATE TABLE IF NOT EXISTS team_members (
     is_active        TINYINT(1)   NOT NULL DEFAULT 1,
     created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────
+-- partners — organizations/clients showcased on the public site
+-- ─────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS partners (
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(150) NOT NULL,
+    logo        VARCHAR(255) NULL,
+    website_url VARCHAR(255) NULL,
+    sort_order  INT          NOT NULL DEFAULT 0,
+    is_active   TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─────────────────────────────────────────────────────────────
@@ -102,7 +133,8 @@ CREATE TABLE IF NOT EXISTS site_settings (
 
 INSERT IGNORE INTO site_settings (setting_key, setting_value) VALUES
     ('company_email',   'amexinnovationslt@gmail.com'),
-    ('company_phone',   '+256 779 008858'),
+    ('company_phone',   '+256 705 104052'),
+    ('company_phone_2', '+256 772 068696'),
     ('company_address', 'Mbarara City, Uganda'),
     ('facebook_url',    '#'),
     ('twitter_url',     '#'),

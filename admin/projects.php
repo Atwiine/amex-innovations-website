@@ -36,16 +36,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flash = 'Title and lead description are required.';
         $flashType = 'error';
     } else {
-        $slug = project_slugify($title);
-        if ($id > 0) {
-            $stmt = db()->prepare('UPDATE projects SET title=?, slug=?, category=?, icon=?, header_class=?, lead=?, problem=?, features=?, techs=?, project_url=?, status_label=?, status_type=?, sort_order=?, is_active=? WHERE id=?');
-            $stmt->execute([$title, $slug, $category, $icon, $headerClass, $lead, $problem, $features, $techs, $projectUrl ?: null, $statusLabel, $statusType, $sort, $active, $id]);
-        } else {
-            $stmt = db()->prepare('INSERT INTO projects (title, slug, category, icon, header_class, lead, problem, features, techs, project_url, status_label, status_type, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-            $stmt->execute([$title, $slug, $category, $icon, $headerClass, $lead, $problem, $features, $techs, $projectUrl ?: null, $statusLabel, $statusType, $sort, $active]);
+        $imagePath = null;
+        $quality = (int) ($_POST['quality'] ?? 82);
+        try {
+            $imagePath = upload_image('image', 'projects', 1600, $quality);
+        } catch (RuntimeException $e) {
+            $flash = $e->getMessage();
+            $flashType = 'error';
         }
-        header('Location: projects.php?saved=1');
-        exit;
+
+        if (!$flash) {
+            $slug = project_slugify($title);
+            if ($id > 0) {
+                if ($imagePath) {
+                    $stmt = db()->prepare('UPDATE projects SET title=?, slug=?, category=?, icon=?, header_class=?, image=?, lead=?, problem=?, features=?, techs=?, project_url=?, status_label=?, status_type=?, sort_order=?, is_active=? WHERE id=?');
+                    $stmt->execute([$title, $slug, $category, $icon, $headerClass, $imagePath, $lead, $problem, $features, $techs, $projectUrl ?: null, $statusLabel, $statusType, $sort, $active, $id]);
+                } else {
+                    $stmt = db()->prepare('UPDATE projects SET title=?, slug=?, category=?, icon=?, header_class=?, lead=?, problem=?, features=?, techs=?, project_url=?, status_label=?, status_type=?, sort_order=?, is_active=? WHERE id=?');
+                    $stmt->execute([$title, $slug, $category, $icon, $headerClass, $lead, $problem, $features, $techs, $projectUrl ?: null, $statusLabel, $statusType, $sort, $active, $id]);
+                }
+                log_action('project_update', $title);
+            } else {
+                $stmt = db()->prepare('INSERT INTO projects (title, slug, category, icon, header_class, image, lead, problem, features, techs, project_url, status_label, status_type, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+                $stmt->execute([$title, $slug, $category, $icon, $headerClass, $imagePath, $lead, $problem, $features, $techs, $projectUrl ?: null, $statusLabel, $statusType, $sort, $active]);
+                log_action('project_create', $title);
+            }
+            header('Location: projects.php?saved=1');
+            exit;
+        }
     }
 }
 
@@ -54,7 +72,12 @@ if (isset($_GET['delete'])) {
         http_response_code(400);
         die('Invalid request.');
     }
-    db()->prepare('DELETE FROM projects WHERE id = ?')->execute([(int) $_GET['delete']]);
+    $deleteId = (int) $_GET['delete'];
+    $target = db()->prepare('SELECT title FROM projects WHERE id = ?');
+    $target->execute([$deleteId]);
+    $target = $target->fetch();
+    db()->prepare('DELETE FROM projects WHERE id = ?')->execute([$deleteId]);
+    log_action('project_delete', $target['title'] ?? "#$deleteId");
     header('Location: projects.php?deleted=1');
     exit;
 }
@@ -79,11 +102,25 @@ require __DIR__ . '/includes/admin-header.php';
 
 <div class="admin-card">
     <h3 style="margin-top:0;"><?= $editing ? 'Edit Project' : 'Add a Project' ?></h3>
-    <form method="post" class="admin-form">
+    <form method="post" class="admin-form" enctype="multipart/form-data">
         <?= csrf_field() ?>
         <input type="hidden" name="id" value="<?= (int) ($editing['id'] ?? 0) ?>">
         <label>Title</label>
         <input type="text" name="title" required value="<?= e($editing['title'] ?? '') ?>">
+
+        <label>Project Image <?= $editing ? '(leave empty to keep current)' : '(optional — falls back to the icon + color banner if not set)' ?></label>
+        <img id="image-preview" src="../<?= e($editing['image'] ?? '') ?>" style="height:90px; width:160px; object-fit:cover; border-radius:8px; margin-bottom:8px; <?= empty($editing['image']) ? 'display:none;' : 'display:block;' ?>">
+        <input type="file" name="image" accept="image/*" onchange="previewImage(this, 'image-preview', 'image-filesize')">
+        <div id="image-filesize" style="font-size:12px; color:var(--a-text); margin-top:4px;">
+            <?= $editing && !empty($editing['image']) ? 'Current size: ' . e(admin_file_size($editing['image']) ?? 'unknown') : 'JPG, PNG, WEBP, or GIF' ?>
+        </div>
+        <label style="display:flex; justify-content:space-between; margin-top:14px;">
+            <span>Compression quality</span>
+            <span id="qval">82</span>
+        </label>
+        <input type="range" name="quality" min="50" max="95" value="82" style="width:100%;"
+               oninput="document.getElementById('qval').textContent = this.value">
+        <p style="font-size:11px; color:var(--a-text); margin:6px 0 0;">Lower = smaller file, more compression. Images are also auto-resized to a max of 1600px.</p>
 
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
             <div>
@@ -152,10 +189,11 @@ require __DIR__ . '/includes/admin-header.php';
 <div class="admin-card">
     <h3 style="margin-top:0;">All Projects</h3>
     <table class="admin-table">
-        <thead><tr><th>#</th><th>Title</th><th>Category</th><th>Status</th><th>Active</th><th></th></tr></thead>
+        <thead><tr><th></th><th>#</th><th>Title</th><th>Category</th><th>Status</th><th>Active</th><th></th></tr></thead>
         <tbody>
         <?php foreach ($projects as $p): ?>
             <tr>
+                <td><?php if (!empty($p['image'])): ?><img src="../<?= e($p['image']) ?>" style="width:40px; height:40px; border-radius:8px; object-fit:cover;"><?php endif; ?></td>
                 <td><?= (int) $p['sort_order'] ?></td>
                 <td><?= e($p['title']) ?></td>
                 <td><?= e(project_category_meta($p['category'])[0]) ?></td>
@@ -170,5 +208,20 @@ require __DIR__ . '/includes/admin-header.php';
         </tbody>
     </table>
 </div>
+
+<script>
+function previewImage(input, previewId, sizeId) {
+    const file = input.files[0];
+    if (!file) return;
+    const preview = document.getElementById(previewId);
+    const sizeLabel = document.getElementById(sizeId);
+    const reader = new FileReader();
+    reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+    reader.readAsDataURL(file);
+    const kb = file.size / 1024;
+    const sizeText = kb < 1024 ? kb.toFixed(1) + ' KB' : (kb / 1024).toFixed(2) + ' MB';
+    sizeLabel.textContent = 'Selected file: ' + sizeText + ' (before compression)';
+}
+</script>
 
 <?php require __DIR__ . '/includes/admin-footer.php'; ?>

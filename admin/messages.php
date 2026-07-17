@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int) ($_POST['id'] ?? 0);
     if (isset($_POST['set_status']) && in_array($_POST['set_status'], $validStatuses, true)) {
         db()->prepare('UPDATE contact_messages SET status = ? WHERE id = ?')->execute([$_POST['set_status'], $id]);
+        log_action('message_status', "#$id -> {$_POST['set_status']}");
     }
     header('Location: messages.php' . ($id ? '?view=' . $id : ''));
     exit;
@@ -20,7 +21,9 @@ if (isset($_GET['delete'])) {
         http_response_code(400);
         die('Invalid request.');
     }
-    db()->prepare('DELETE FROM contact_messages WHERE id = ?')->execute([(int) $_GET['delete']]);
+    $deleteId = (int) $_GET['delete'];
+    db()->prepare('DELETE FROM contact_messages WHERE id = ?')->execute([$deleteId]);
+    log_action('message_delete', "#$deleteId");
     header('Location: messages.php?deleted=1');
     exit;
 }

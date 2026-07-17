@@ -38,20 +38,15 @@ $projects = db()->query('SELECT * FROM projects WHERE is_active = 1 ORDER BY sor
         height:160px; display:flex; align-items:center; justify-content:center;
         position:relative; overflow:hidden;
     }
+    .ai-card-header-overlay {
+        position:absolute; inset:0; background:rgba(7,23,48,0.45); z-index:1;
+    }
     .ai-card-header .ai-card-icon {
         width:72px; height:72px; border-radius:20px; display:flex;
         align-items:center; justify-content:center; font-size:30px; color:#fff;
         background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.3);
         z-index:2; position:relative;
     }
-    .ai-card-header .ai-status-dot {
-        position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.95);
-        border-radius:50px; padding:4px 10px; font-size:11px; font-weight:700;
-        display:flex; align-items:center; gap:5px;
-    }
-    .ai-status-dot .dot { width:7px; height:7px; border-radius:50%; background:#22c55e; display:inline-block; }
-    .ai-status-dot.deployed .dot { background:#f59e0b; }
-
     .ai-card-body { padding:22px; }
     .ai-card-tag {
         display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase;
@@ -103,9 +98,6 @@ $projects = db()->query('SELECT * FROM projects WHERE is_active = 1 ORDER BY sor
     .ai-modal-techs { display:flex; flex-wrap:wrap; gap:8px; }
     .ai-modal-tech { background:var(--ve-light); border:1px solid var(--ve-border); border-radius:6px; padding:5px 12px; font-size:12px; font-weight:700; color:var(--ve-dark); }
     .ai-modal-footer { padding:20px 36px; border-top:1px solid var(--ve-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
-    .ai-modal-status { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--ve-dark); }
-    .ai-modal-status .dot { width:9px; height:9px; border-radius:50%; background:#22c55e; }
-    .ai-modal-status .dot.amber { background:#f59e0b; }
 
     /* ── Colour presets for card/modal headers ──────── */
     .bg-blue   { background:linear-gradient(135deg,#0D47A1,#1976D2); }
@@ -176,12 +168,11 @@ $projects = db()->query('SELECT * FROM projects WHERE is_active = 1 ORDER BY sor
             <div class="ai-projects-grid">
                 <?php foreach ($projects as $p):
                     [$tagLabel, $tagClass] = project_category_meta($p['category']);
-                    $isDeployed = $p['status_type'] === 'deployed';
                 ?>
                 <div class="ai-project-card" data-category="<?= e($p['category']) ?>" data-project="<?= e($p['slug']) ?>">
-                    <div class="ai-card-header <?= e($p['header_class']) ?>">
+                    <div class="ai-card-header <?= e($p['header_class']) ?>" <?= !empty($p['image']) ? 'style="background-image:url(' . e($p['image']) . ');background-size:cover;background-position:center;"' : '' ?>>
+                        <?php if (!empty($p['image'])): ?><div class="ai-card-header-overlay"></div><?php endif; ?>
                         <div class="ai-card-icon"><i class="fa <?= e($p['icon']) ?>"></i></div>
-                        <span class="ai-status-dot<?= $isDeployed ? ' deployed' : '' ?>"><span class="dot<?= $isDeployed ? ' amber' : '' ?>"></span> <?= $isDeployed ? 'Deployed' : 'Live' ?></span>
                     </div>
                     <div class="ai-card-body">
                         <span class="ai-card-tag <?= e($tagClass) ?>"><?= e($tagLabel) ?></span>
@@ -234,8 +225,7 @@ $projects = db()->query('SELECT * FROM projects WHERE is_active = 1 ORDER BY sor
                     <div class="ai-modal-techs" id="modalTechs"></div>
                 </div>
             </div>
-            <div class="ai-modal-footer">
-                <div class="ai-modal-status" id="modalStatus"></div>
+            <div class="ai-modal-footer" style="justify-content:flex-end;">
                 <a href="contact.php" class="ve-btn-primary" style="font-size:14px; padding:11px 24px;">Discuss a Similar System</a>
             </div>
         </div>
@@ -253,12 +243,11 @@ const projects = <?php
             'tagClass'   => $tagClass,
             'headerClass'=> $p['header_class'],
             'icon'       => $p['icon'],
+            'image'      => $p['image'] ?: '',
             'lead'       => $p['lead'],
             'problem'    => $p['problem'],
             'features'   => lines_to_array($p['features']),
             'techs'      => lines_to_array($p['techs']),
-            'status'     => $p['status_label'],
-            'statusDot'  => $p['status_type'] === 'deployed' ? 'amber' : '',
         ];
     }
     echo json_encode($jsData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -287,7 +276,6 @@ const modalLead = document.getElementById('modalLead');
 const modalProblem = document.getElementById('modalProblem');
 const modalFeatures = document.getElementById('modalFeatures');
 const modalTechs = document.getElementById('modalTechs');
-const modalStatus = document.getElementById('modalStatus');
 
 document.querySelectorAll('.ai-project-card').forEach(card => {
     card.addEventListener('click', function() {
@@ -296,6 +284,13 @@ document.querySelectorAll('.ai-project-card').forEach(card => {
         if (!p) return;
 
         modalHeader.className = 'ai-modal-header ' + p.headerClass;
+        if (p.image) {
+            modalHeader.style.backgroundImage = 'linear-gradient(rgba(7,23,48,0.45),rgba(7,23,48,0.45)), url(' + encodeURI(p.image) + ')';
+            modalHeader.style.backgroundSize = 'cover';
+            modalHeader.style.backgroundPosition = 'center';
+        } else {
+            modalHeader.style.backgroundImage = '';
+        }
         modalIcon.innerHTML = '<i class="fa ' + p.icon + '"></i>';
         modalTag.textContent = p.tag;
         modalTag.className = 'ai-card-tag ai-modal-tag ' + p.tagClass;
@@ -305,11 +300,6 @@ document.querySelectorAll('.ai-project-card').forEach(card => {
 
         modalFeatures.innerHTML = p.features.map(f => '<li>' + f + '</li>').join('');
         modalTechs.innerHTML = p.techs.map(t => '<span class="ai-modal-tech">' + t + '</span>').join('');
-
-        const dot = p.statusDot === 'amber'
-            ? '<span class="dot amber"></span>'
-            : '<span class="dot"></span>';
-        modalStatus.innerHTML = dot + ' ' + p.status;
 
         backdrop.classList.add('open');
         document.body.style.overflow = 'hidden';

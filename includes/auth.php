@@ -91,11 +91,27 @@ function attempt_login($username, $password) {
     $upd = db()->prepare('UPDATE admin_users SET last_login_at = NOW() WHERE id = ?');
     $upd->execute([$user['id']]);
 
+    log_action('login');
+
     return true;
 }
 
 function logout_admin() {
     start_session_once();
+    log_action('logout');
     $_SESSION = [];
     session_destroy();
+}
+
+/** Records an entry in the audit log for the currently logged-in admin. */
+function log_action($action, $details = '') {
+    $admin = current_admin();
+    $stmt = db()->prepare('INSERT INTO audit_log (admin_id, admin_username, action, details, ip_address) VALUES (?, ?, ?, ?, ?)');
+    $stmt->execute([
+        $admin['id'] ?? null,
+        $admin['username'] ?? 'unknown',
+        $action,
+        $details,
+        $_SERVER['REMOTE_ADDR'] ?? '',
+    ]);
 }

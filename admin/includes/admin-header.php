@@ -82,9 +82,12 @@ function admin_nav_active($key, $active) {
             <a href="services.php" class="<?= admin_nav_active('services', $admin_active) ?>">Services</a>
             <a href="projects.php" class="<?= admin_nav_active('projects', $admin_active) ?>">Projects</a>
             <a href="team.php" class="<?= admin_nav_active('team', $admin_active) ?>">Team</a>
+            <a href="partners.php" class="<?= admin_nav_active('partners', $admin_active) ?>">Partners</a>
             <a href="images.php" class="<?= admin_nav_active('images', $admin_active) ?>">Images</a>
             <a href="messages.php" class="<?= admin_nav_active('messages', $admin_active) ?>">Messages</a>
             <a href="settings.php" class="<?= admin_nav_active('settings', $admin_active) ?>">Settings</a>
+            <a href="admins.php" class="<?= admin_nav_active('admins', $admin_active) ?>">Admin Users</a>
+            <a href="audit-log.php" class="<?= admin_nav_active('audit-log', $admin_active) ?>">Audit Log</a>
             <a href="../index.php" target="_blank">View Site ↗</a>
         </nav>
     </aside>
@@ -92,7 +95,7 @@ function admin_nav_active($key, $active) {
         <div class="admin-topbar">
             <h1><?= e($admin_page_title) ?></h1>
             <div class="user">
-                <span><?= e($admin['username'] ?? '') ?></span>
+                <a href="profile.php" style="color:inherit; font-weight:600;"><?= e($admin['username'] ?? '') ?></a>
                 <a href="logout.php" class="admin-btn admin-btn-secondary">Log Out</a>
             </div>
         </div>
